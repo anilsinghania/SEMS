@@ -1,0 +1,93 @@
+
+<div data-role="page" id="last_trans" >
+
+	<div data-role="header" class="header" style="background-color: #D97B62; color: #ffffff; height:10%; position: relative; width: 100%; z-index: 100;text-align: center;border: none; clear: both;">
+		<div class="ui-grid-b" style="width: 100%;height:100%;">
+			<div class="ui-block-a" style="width: 20%;height:100%;" id="trans_back">
+				<img alt="anil" src="./img/back.png" style=" margin-top:5%; text-align:center; height:90%; width:75%;background-color: transparent;">
+			</div>
+			<div class="ui-block-b" style="width: 60%;height:100%;">
+					<label style="margin-top:7%;text-transform: none;"><h1>Last Transactions</h1></label>
+			</div>
+			<div class="ui-block-c" style="width: 20%;height:100%;">
+				<img alt="anil" src="./img/right.png" style="margin-top:20%; text-align:center;height:50%; width:20%; background-color: transparent;">
+			</div>
+		</div>
+		<div class="ui-grid-b" style="background-color: #F2F2F2; left: 0em; width: 100%; height: 38px; text-transform: none; font-weight: bold; font-size: small; float: left; padding: 0em;">
+        	<label class="ui-block-a" id="btn_tentrans" style="color: #7C7C7C; text-align: center; text-transform: none; text-shadow: none; border-right: 1px solid white; height: 100%; display: block; line-height: 38px; width: 50%;">Last 10 Trans.</label>
+            <label class="ui-block-b" id="btn_detailtrans" style="color: #7C7C7C; text-align: center; text-transform: none; text-shadow: none; height: 100%; border-right: 1px solid white; display: block; line-height: 38px; width: 50%;">Details Trans.</label>
+        </div>
+	</div>
+
+	<!-- Main Contents  -->
+	<div data-role="main" align="center" class="ui-content main" style="text-align: center;width: 100%;">
+		<div id="ten_trans" style="background-color: transparent; height: 100%; float: left; display: none; width: 100%;">
+			
+			<ul data-role="listview" class="scrollablefirst"  id="list_transten" style="width: 100%;"> 
+				<!-- <li style="background-color: green; width:100%;border-width:0px;" >
+					<div class="ui-grid-c">
+						<label class="ui-block-a" style="width: 30%; height: 100%; color:white; text-transform: none;text-align: center;border:1px solid white!important;">Date</label>
+						<label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Trans_Id</label>
+						<label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Mode</label>
+						<label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Amount</label>
+					</div>
+				</li>  -->
+			</ul> 
+		</div>
+		
+		<div id="detail_trans" style="background-color: transparent; height: 100%; float: left; display: none; width: 100%;">
+			<ul data-role="listview" class="scrollablefirst"  id="list_transdetail" style="width: 100%;">
+				<!-- <li style="background-color: green; width:100%;border-width:0px;" >
+					<div class="ui-grid-c">
+						<label class="ui-block-a" style="width: 30%; height: 100%; color:white; text-transform: none;text-align: center;border:1px solid white!important;">Date</label>
+						<label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Trans_Id</label>
+						<label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Mode</label>
+						<label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-transform: none;text-align: center;border:1px solid white!important;">Amount</label>
+					</div>
+				</li>  -->
+			</ul>
+		</div>
+		<div id="detail_fill" style="background-color:transparent; float: left; display: none; width: 90%;height: 100%;padding: 0px; margin: 0 auto;" >
+			<label style="color: white; text-align: center; text-transform: none; text-shadow: none; border-right: 0px;height:100%;display:flex;justify-content:center;align-items:center;">Starting Date:</label>
+			<input id="st_dt" type="date" placeholder="Starting Date "
+                style="background-image: url('img/calender.png'); background-position: 5px; background-repeat: no-repeat; padding-left: 55px; height: 50px; font-size:large;  color: #ffffff; border: 1px solid #FFFFFF; text-shadow: none;background-color: #ee5922;">
+            <label style="color: white; text-align: center; text-transform: none; text-shadow: none; border-right: 0px;height:100%;display:flex;justify-content:center;align-items:center;">Ending Date:</label>
+            <input id="en_dt" type="date" placeholder="Ending Date"
+                style="background-image: url('img/calender.png'); background-position: 5px; background-repeat: no-repeat; padding-left: 55px; height: 50px; font-size:large;  color: #ffffff; border: 1px solid #FFFFFF; text-shadow: none;background-color: #ee5922;">
+			
+			
+			<a href="#" id="show_trans" class="ui-btn ui-corner-all ui-btn-inline" style="background-color: green;color:white;text-shadow: none;">Transactions</a>
+		</div>
+	
+	</div>
+	
+	<!-- Footer  -->
+	<div data-role="footer" data-position="fixed" class="ui-bar" style="height: 7%;width:100%;padding:0px; background-color: #D95F3E; color: #ffffff;text-align: center;border: none;">
+		<div class="ui-grid-b" style="width: 100%;height:100%;">
+			<div class="ui-block-a" style="width: 20%;height:100%;text-align: center;margin-top: 3%;">
+				<label style="margin-top: 3%;"></label>
+			</div>
+			<div class="ui-block-b ui-grid-d" style="width: 60%;height:100%;text-align: center;margin-top: 3%;">
+				<div class="ui-block-a" style="width: 20%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">T&C</label>
+				</div>
+				<div class="ui-block-b" style="width: 5%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">|</label>
+				</div>
+				<div class="ui-block-c" style="width: 45%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;text-transform: none;">Notification</label>
+				</div>
+				<div class="ui-block-d" style="width: 5%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">|</label>
+				</div>
+				<div class="ui-block-e" style="width: 25%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;text-transform: none;">Policy</label>
+				</div>
+			</div>
+			<div class="ui-block-c" style="width: 20%;height:100%;text-align: center;">
+				<img alt="anil" src="./img/build_log.png" style="margin-top:7%; text-align:center;height:70%; width:40%; background-color: transparent;">
+			</div>
+		
+		</div>
+	</div>
+</div>	

@@ -1,0 +1,129 @@
+
+<div data-role="page" id="pres_status" >
+
+	<div data-role="header" class="header" style="background-color: #D97B62; color: #ffffff; height:10%; position: relative; width: 100%; z-index: 100;text-align: center;border: none; clear: both;">
+		<div class="ui-grid-b" style="width: 100%;height:100%;">
+			<div class="ui-block-a" style="width: 20%;height:100%;" id="pre_back">
+				<img alt="anil" src="./img/back.png" style=" margin-top:5%; text-align:center; height:90%; width:75%;background-color: transparent;">
+			</div>
+			<div class="ui-block-b" style="width: 60%;height:100%;">
+					<label style="margin-top:7%;text-transform: none;"><h1>Present Status</h1></label>
+			</div>
+			<div class="ui-block-c" style="width: 20%;height:100%;">
+				<img alt="anil" src="./img/right.png" style="margin-top:20%; text-align:center;height:50%; width:20%; background-color: transparent;">
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Contents  -->
+	<div data-role="main" align="center" class="ui-content main" style="text-align: center;background-color: transparent; width: 100%; height: 100%;">
+		<!-- <table id="myTable" style="text-align: center;text-shadow: none;margin: 5%;">
+			<tr>
+			    <th> </th>
+			    <th>R</th>
+			    <th>Y</th>
+			    <th>B</th>
+			  </tr>
+			  <tr>
+			    <td>Voltage</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			  </tr>
+			  <tr>
+			    <td>Current</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			  </tr>
+			  <tr>
+			    <td>Active Power</td>
+			    <td>cell 4</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			  </tr>
+			</table>
+			
+		<table id="light" style="text-align: center;text-shadow: none;margin: 5%;">
+			<tr>
+			    <th>EB</th>
+			    <th>DG</th>
+			    <th>SM</th>
+			    <th>OL</th>
+			    <th>LB</th>
+			  </tr>
+			  <tr>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			    <td>cell 2</td>
+			     <td>cell 2</td>
+			  </tr>
+			</table> -->
+		<div id="voltage" style="width: 90%;height: 25%;background-color: transparent;text-align: center;"align="center">
+			<!--	voltage table  -->
+		</div>
+			
+		<div id="mt_tab" style="width: 90%;height: 20%;background-color: transparent;text-align: center;margin-top: 2%;" align="center">
+			<!--	eb_dg table  -->
+		</div>
+		<div id="meter_read" style="width: 90%;height: 20%;background-color: transparent;text-align: center;margin-top: 2%;" align="center">
+			<!--	meter table  -->
+			<div class="ui-grid-a" style="width: 100%;height:100%;">
+				<div class="ui-block-a" style="width: 50%;display:flex;justify-content:center;align-items:center;height: 100%;">
+					<label style="height: 100%; text-align: center;color: white;text-shadow: none;">Meter Reading(KWH)</label>
+				</div>
+				<div class="ui-block-b" id="read_tbl" style="width: 50%;height:100%;text-align: center;">
+					<!--	reading table  -->
+				</div>
+			</div>
+		</div>
+		<div id="billing" style="width: 90%;height: 20%;background-color: transparent;text-align: center;margin-top: 2%;" align="center">
+			
+			<div class="ui-grid-b" style="width: 100%;height:100%;">
+				<div class="ui-block-a" style="width: 20%;display:flex;justify-content:center;align-items:center;height: 100%;">
+					<label style="height: 100%; text-align: center;color: white;text-shadow: none;">Billing:-</label>
+				</div>
+				<div class="ui-block-b" style="width: 5%;display:flex;justify-content:center;align-items:center;height: 100%;">
+				</div>
+				<div class="ui-block-c" id="bill_data" style="width: 75%;height:100%;text-align: center;">
+					<!-- <label style="float:left; color: white;text-shadow: none;">Opening_Balance:- Anil</label>
+					<label style="float:left;color: white;text-shadow: none;">Uploaded_Balance:-anil</label>
+					<label style="float:left;color: white;text-shadow: none;">Bill_Amount:-anil</label>
+					<label style="float:left;color: white;text-shadow: none;">Current_Balance:-anil</label> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Footer  -->
+	<div data-role="footer" data-position="fixed" class="ui-bar" style="height: 7%;width:100%;padding:0px; background-color: #D95F3E; color: #ffffff;text-align: center;border: none;">
+		<div class="ui-grid-b" style="width: 100%;height:100%;">
+			<div class="ui-block-a" style="width: 20%;height:100%;text-align: center;margin-top: 3%;">
+				<label style="margin-top: 3%;"></label>
+			</div>
+			<div class="ui-block-b ui-grid-d" style="width: 60%;height:100%;text-align: center;margin-top: 3%;">
+				<div class="ui-block-a" style="width: 20%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">T&C</label>
+				</div>
+				<div class="ui-block-b" style="width: 5%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">|</label>
+				</div>
+				<div class="ui-block-c" style="width: 45%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;text-transform: none;">Notification</label>
+				</div>
+				<div class="ui-block-d" style="width: 5%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;">|</label>
+				</div>
+				<div class="ui-block-e" style="width: 25%;height:100%;text-align: center;">
+					<label style="margin-top: 3%;text-transform: none;">Policy</label>
+				</div>
+			</div>
+			<div class="ui-block-c" style="width: 20%;height:100%;text-align: center;">
+				<img alt="anil" src="./img/build_log.png" style="margin-top:7%; text-align:center;height:70%; width:40%; background-color: transparent;">
+			</div>
+		
+		</div>
+	</div>
+	
+</div>	

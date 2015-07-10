@@ -1,0 +1,78 @@
+{
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-whitelist@1"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.synconset.internalStorage": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wymsee/cordova-internalStorage.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.file": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.file"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
+    "com.intelegate.cordova.plugin.LocalStoragePlugin": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Philcartmell/cordova-plugin-local-storage.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.splashscreen": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.splashscreen"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.jcjee.plugins.emailcomposer": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jcjee/email-composer.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.dialogs": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.dialogs"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.paypal.cordova.mobilesdk": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/paypal/PayPal-Cordova-Plugin.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-datetime-picker": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-datetime-picker"
+        },
+        "is_top_level": true,
+        "variables": {}
+    }
+}

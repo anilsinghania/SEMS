@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /> -->
+		<meta name="msapplication-tap-highlight" content="no" />
+		<!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
+		<link rel="stylesheet" href="css/index.css" type="text/css" />
+		<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">
+		
+		<title>Hello World</title>
+        <script type="text/javascript" src="cordova.js"></script>
+		<script src="./js/jquery-1.11.2.min.js"></script>
+		<script src="js/jquery-2.0.2.min.js"></script>
+		<script src="js/jquery-ui.js"></script>
+		<script src="js/jquery.mobile-1.4.2.min.js"></script>
+		<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+		<script src="./js/vars.js"></script>
+		<script src="./js/paypalapp.js"></script>
+		<script src="./js/Chart.js"></script>
+		<script type="text/javascript" src="js/paypal-mobile-js-helper.js"></script>
+		 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+		var status;
+		var start_dt;
+		var end_dt;
+		var mobilepin;
+		var servent_mode;
+		var load_mode;
+		var alertTimerId = 0;
+		var alertloadId = 0;
+		var tab_id;
+		var trans_tab;
+		var count=0;
+		var valid=0;
+		var timeDate;
+		var trans_tab;
+		var arr1 = [];
+		var arr2 = [];
+		var arr3 = [];
+		var arr4 = [];
+		var ae_main;
+		var ae_dg;
+		var amount;
+		var dt;
+		var json_res=0;
+		google.load("visualization", "1.1", {packages:["bar"]}); 
+		document.addEventListener("deviceready",onDeviceReady,false);
+		
+		function onDeviceReady() {
+		  /*  window.localStorage.clear();  */ 
+			var value = window.localStorage.getItem("access");
+			var pin_value = window.localStorage.getItem("m_pin");
+			if(value=="1"||pin_value=="0"){
+				$.mobile.changePage('login1.html',{changeHash:false});
+			}else if(value=="0"||pin_value=="1"){
+				$.mobile.changePage('login.html',{changeHash:false});
+			}else {
+				$.mobile.changePage('home.html',{changeHash:false});
+			}
+			otherScripts();
+			$(document).bind('backbutton', onPressBack);
+		}
+		function onPressBack(e) {
+			   /*  e.preventDefault(); */
+			  /*  navigator.notification.confirm("hihih", confirmCallback, "Hello", ["Ok","Cancel"]); */
+			     navigator.notification.confirm("Do you want to quit?", function(result){
+			        if(result == 2){
+			        	window.localStorage.setItem("session","loggedout");
+			        	navigator.app.exitApp();
+			        }
+			    }, 'SEMS Application', 'Cancel,Ok');
+			}
+		
+		//Function for validate Mobile Number
+		function validatePhoneNumber(number)
+    			{
+    				count=number.length;
+    				if(number[0]!=" " && number[0]!="-" && number[count-1]!=" " && number[count-1]!="-")
+    				{
+    					temp=number.replace(" ", "");
+    					temp=temp.replace("-", "");
+    					if($.isNumeric(temp))
+    					{
+    						if(temp.length>=7 && temp.length<=12)
+    						{
+    							flag=1;
+    							for(i=1;i<count;i++)
+    							{			
+    								if(number[i]=="-" || number[i]==" ")
+    								{
+    									if(number[i-1]=="-" || number[i-1]==" " || number[i+1]=="-" || number[i+1]==" ")
+    									{
+    										flag=0;
+    									}
+    								}				
+    							}
+    							
+    							if(flag==1)
+    							{
+    								valid=1;
+    							}
+    							else
+    							{
+    								valid=0;
+    							}
+    						}
+    						else
+    						{
+    							valid=0;
+    						}
+    					}
+    					else
+    					{
+    						valid=0;
+    					}
+
+    				}
+    				else
+    				{
+    					valid=0;
+    				}
+    				return valid;
+    			}//function validate phonenumber 
+		
+		function fun_otpgen(){
+			var m_number= $("#mobile_number").val();
+			var e_id= $("#emailid").val();
+			var isValid = true;
+			
+			$('.errormessage').each(function(){
+				if($.trim($(this).val()) != ''){
+					isValid = false;
+					$(this).attr("style","border:1px solid red!important;background:#FFCECE!important;");
+				}
+			});
+			
+			if(e_id!=""){
+				var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+				if(!emailReg.test(e_id)) {
+					isValid = false;
+					navigator.notification.alert('Please enter a valid E-mail id',function(){ },'Invalid E-mail','Continue');
+					$('#emailid').attr("style","border:1px solid red!important;background:#FFCECE!important;");
+					$("#emailid").val("");
+				}
+			}else{
+				$('#emailid').attr("style","border:1px solid red!important;background:#FFCECE!important;");
+				isValid = false;
+			}
+			
+			if($("#mobile_number").val()!=""){
+				if(validatePhoneNumber($("#mobile_number").val())==0){
+					isValid = false;
+					navigator.notification.alert('Please enter a valid number',function(){ },'Invalid Number','Continue');	
+					$('#mobile_number').attr("style","border:1px solid red!important;background:#FFCECE!important;");
+					$("#mobile_number").val("");
+				}
+			}else{
+				$('#mobile_number').attr("style","border:1px solid red!important;background:#FFCECE!important;");
+				isValid = false;
+			}
+			
+			if(isValid){
+				var data={mobile:m_number,email:e_id};
+				$.ajax({
+  	        		  type: "POST",
+  	        		  data:data,
+  	        		  url: address+"otp_gen.php",
+  	        		  success: function(data){
+  	        		  	if(data){
+  	        		  		navigator.notification.confirm(
+  	        		  			"OTP sent on Email", 
+  	        		  			function(result){
+			  	  			        if(result == 1){
+				  	  			        window.localStorage.setItem("mobile_number", m_number);
+				  	        			$("#mobile_number").val(" ");
+				  	        			$("#emailid").val(" ");
+				  	        			$.mobile.changePage("firstpage.html", {changeHash : true});
+			  	  			        }
+								},
+  	  			    			'Successful', 'Continue'); 
+  	        		  	}else{
+  	        		  		navigator.notification.alert('Mobile Does not exit',function(){ },'Unsuccessful','Continue');
+  	        		  		$('#mobile_number').attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        		  	}
+  	        		 },
+  	        	});
+			}
+  		}
+    			
+    	function fun_matchotp(){
+    		var user_num = window.localStorage.getItem("mobile_number");
+			var otp_txt=$("#main_otp").val();
+			if(otp_txt==""){
+  				$("#main_otp").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else{
+  	        	var data={otp :otp_txt,mobile:user_num};
+				$.ajax({
+  	        		  type: "POST",
+  	        		  data:data,
+  	        		  url: address+"otp_matcher.php",
+  	        		  success: function(data){
+  	        			  if(data){
+  	        			  	navigator.notification.alert('OTP Match',function(){ },'Successful','Continue');
+	  	        			$("#main_otp").val(" ");
+	  	        			$.mobile.changePage("forgetpage.html", {changeHash : true});
+						  }else{
+							  navigator.notification.alert('OTP Mismatch',function(){ },'Unsuccessful','Continue');
+							  $("#main_otp").val(" ");
+  	        			  }
+  	        		  },
+  	        	}); 
+			}
+    	}
+    	
+    	function fun_mpin(){
+    		var main_apntxt=$("#org_apn_txt").val();
+			var conf_apntxt=$("#con_apn_txt").val();
+			if(main_apntxt==""){
+  				$("#org_apn_txt").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else if(conf_apntxt==""){
+  				$("#con_apn_txt").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else if(main_apntxt==conf_apntxt){
+  	        	var user_num = window.localStorage.getItem("mobile_number");
+  	        	alert(user_num);
+  	        	var data={mobile:user_num,mpin:main_apntxt};
+				$.ajax({
+  	        		  type: "POST",
+  	        		  data:data,
+  	        		  url: address+"mpin.php",
+  	        		  success: function(data){
+  	        			  if(data){
+  	        				  navigator.notification.alert('M-Pin Create successfully',function(){ },'Successful','Continue');
+  	        				  $("#org_apn_txt").val(" ");
+	  	        			  $("#con_apn_txt").val(" ");
+	  	        			  mobilepin="1";
+			  	        	  window.localStorage.setItem("m_pin", mobilepin);
+			  	        	  $.mobile.changePage('login.html',{changeHash:false});
+  	        			  }else{
+  	        				  navigator.notification.alert('Error',function(){ },'Unsuccessful','Continue');
+  	        			  }
+  	        		  },
+  	        	});
+  	        }else{
+				$("#org_apn_txt").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+				$("#con_apn_txt").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+				navigator.notification.alert('OTP are not same',function(){ },'OTP Mismatch','Continue');	
+  	        }
+    	}
+    		
+    	function fun_mpinlog(){
+    		var user_num = window.localStorage.getItem("mobile_number"); 
+			/* var user_num = "9468114881"; */
+			var mpin_txt=$("#log_pin").val();
+			if(mpin_txt==""){
+  				$("#log_pin").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else{
+  	        	var data={mobile:user_num,mpin:mpin_txt};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"mpinlog.php",
+  	        		  success: function(response){
+  	        			if(response){
+  	        				/* alert(data1.yy.Meter_Serial_No); */
+  	        				var meter_num=response.anil.Meter_Serial_No;
+  	        				window.localStorage.setItem("meter_id", meter_num);
+  	        				navigator.notification.alert('LogIn with Meter_Id: '+meter_num,function(){ },'Successful','Continue');
+	  	        		  	$("#log_pin").val("");
+	  	        		  	window.localStorage.setItem("session","loggedin");
+	  	        		   	$.mobile.changePage("home.html", {changeHash : true}); 
+  	        			}else{
+  	        				navigator.notification.alert('M-Pin Does not exit',function(){ },'Unsuccessful','Continue');
+  	        				$("#log_pin").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        			}
+  	        		  },
+  	        	}); 
+  	        }
+    	}
+    	
+    	function fun_userlog(){
+    		var user_txt=$("#username").val();
+			var pass_txt=$("#password").val();
+			if(user_txt==""){
+  				$("#username").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else if(pass_txt==""){
+  				$("#password").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else{
+  	        	var data={username:user_txt,password:pass_txt};
+				$.ajax({
+  	        		  type: "POST",
+  	        		  data:data,
+  	        		  url: address+"userlog.php",
+  	        		  success: function(data){
+  	        			if(data){
+  	        				var meter_num=data.anil.Meter_Serial_No;
+  	        				window.localStorage.setItem("meter_id", meter_num);
+  	        				navigator.notification.alert('Meter_Id: '+meter_num,function(){ },'Successful','Continue');
+  	        				$("#username").val(" ");
+	  	        			$("#password").val(" ");
+	  	        			window.localStorage.setItem("session","loggedin");
+	  	        			$.mobile.changePage("home.html", {changeHash : true});
+  	        			}else{
+  	        				navigator.notification.alert('Username or Password does not exit',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});
+  	        }
+    	}
+    	
+    	function fun_coupon(){
+    		var Meter_Id = window.localStorage.getItem("meter_id"); 
+			var cou_code=$("#c_code").val();
+			if(cou_code==""){
+  				$("#c_code").attr("style","border:1px solid red!important;background:#FFCECE!important;");
+  	        }else{
+  	        	var data={Meter_Id: Meter_Id,tranId:cou_code};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"CoupanRecharge.php",
+  	        		  success: function(response){
+  	        			if(response>0){
+  	        				navigator.notification.alert('Coupon has been submitted ',function(){ },'Successful','Continue');
+  	        			}else{
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+  	        }
+    	}
+    	
+    	function fun_profile(){
+    		var Meter_Id = window.localStorage.getItem("meter_id"); 
+			var full_name=$("#fullname").val();
+			var user_name=$("#user").val();
+			var mobile=$("#mobile").val();
+			var email=$("#email").val();
+			/* var Meter_Id = "a00058"; */
+			var data={Meter_Id: Meter_Id,userName:user_name,mobileNo:mobile,emailId:email,userFullName:full_name};
+			$.post(address+'UpdateUserProfile.php', data, function(response) {
+				if(response>0){
+					navigator.notification.alert('Profile Update Successfully.',function(){ },'Successful','Continue');
+					$("#fullname").val("");
+					$("#user").val("");
+					$("#mobile").val("");
+					$("#email").val("");
+				}else{
+					navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+				}
+			}, 'json');
+    	}
+    	
+    	function fun_forgetPin(){
+    		var user_num = window.localStorage.getItem("mobile_number");
+			var reg_mob=$("#reg_mob").val();
+			if(user_num==reg_mob){
+				navigator.notification.alert('Create new M-Pin',function(){ },'Successful','Continue');
+				$.mobile.changePage("forgetpage.html", {changeHash : true});
+			}else{
+				navigator.notification.alert('Please enter registered mobile number',function(){ },'Unsuccessful','Continue');
+				$("#reg_mob").val("");
+			}
+    	}
+    	
+    	function fun_forgetPass(){
+    		var user_num = window.localStorage.getItem("mobile_number");
+			var reg_mob=$("#reg_mob").val();
+			if(user_num==reg_mob){
+				navigator.notification.alert('Password mailed you',function(){ },'Successful','Continue');
+				/* $.mobile.changePage("forgetpage.html", {changeHash : true}); */
+				alert("Services Remaining");
+			}else{
+				navigator.notification.alert('Please enter registered mobile number',function(){ },'Unsuccessful','Continue');
+				$("#reg_mob").val("");
+			}
+    	}
+    	
+    	function fun_tentrans(){
+    		$('#list_transten').empty();
+			var Meter_Id = window.localStorage.getItem("meter_id");  
+			/* var Meter_Id = "a00058";  */
+			var data={Meter_Id: Meter_Id};
+			$.post(address+'GetTransaction.php', data, function(response) {
+				$('#list_transten').append('<li style="background-color: green; width:100%;border-width:0px;" ><div class="ui-grid-c"><label class="ui-block-a" style="width: 30%; height: 100%; color:white; text-transform: none;text-align: center;">Date</label><label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-transform: none;text-align: center;">Trans_Id</label><label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-transform: none;text-align: center;">Mode</label><label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-transform: none;text-align: center;">Amount</label></div></li>');
+				$.each( response, function( key, val ) {
+				    var dtm=val.Current_Date_Time;
+	        			var trns=val.tranid;
+	        			var mode=val.Payment_Mode;
+	        			var amount=val.Amount;
+	        			$('#list_transten').append(
+								'<li style="background-color: transparent;width:100%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 30%; height: 100%; color:white;text-align: center;">'+dtm+'</label><label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-align: center;">'+trns+'</label><label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-align: center;">'+mode+'</label><label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-align: center;">'+amount+'</label></div></li>'); 
+				  });
+			}, 'json');
+    	}
+    	
+    	function fun_detailtrans(){
+    		$('#list_transdetail').empty();
+    		/* var Meter_Id = "a00058"; */ 
+			var Meter_Id = window.localStorage.getItem("meter_id");  
+			alert("Starting Date: "+start_dt);
+			alert("Ending Date: "+end_dt);
+			var data={Meter_Id: Meter_Id,startDate:start_dt,endDate:end_dt};
+			$.post(address+'GetTransaction.php', data, function(response) {
+				$('#list_transdetail').append('<li style="background-color: green; width:100%;border-width:0px;" ><div class="ui-grid-c"><label class="ui-block-a" style="width: 30%; height: 100%; color:white; text-transform: none;text-align: center;">Date</label><label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-transform: none;text-align: center;">Trans_Id</label><label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-transform: none;text-align: center;">Mode</label><label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-transform: none;text-align: center;">Amount</label></div></li>');
+				$.each( response, function( key, val ) {
+				    var dtm=val.Current_Date_Time;
+	        			var trns=val.tranid;
+	        			var mode=val.Payment_Mode;
+	        			var amount=val.Amount;
+	        			$('#list_transdetail').append(
+								'<li style="background-color: transparent;width:100%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 30%; height: 100%; color:white;text-align: center;">'+dtm+'</label><label class="ui-block-b" style="width: 34%; height: 100%; color:white;text-align: center;">'+trns+'</label><label class="ui-block-c" style="width: 17%; height: 100%; color:white;text-align: center;">'+mode+'</label><label class="ui-block-d" style="width: 19%; height: 100%; color:white;text-align: center;">'+amount+'</label></div></li>'); 
+				  });
+			}, 'json');
+    		
+    		
+    	}
+    			
+		function otherScripts(){
+			// script for firstHider page for OTP generate
+			$(document).on('pageshow','#id_fhider',function(){
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        /* alert('You pressed enter otpgen!'); */
+				        fun_otpgen();
+				    }
+				});
+				
+				$("#generate_otp").click(function(){
+					 fun_otpgen();
+				});
+			});	
+    				
+			// script for firstpage page for match OTP
+			$(document).on('pageshow','#id_first',function(){
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        /* alert('You pressed enter! match'); */
+				        fun_matchotp();
+				    }
+				});
+				
+				$("#otp_submit").click(function(){
+					fun_matchotp();
+				 });
+				
+			});
+    			
+			// script for create M-Pin page forgatepage
+			$(document).on('pageshow','#id_create',function(){
+				
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				       /*  alert('You pressed enter!mpin'); */
+				        fun_mpin();
+				    }
+				});
+				
+				$("#btn_cancel").click(function(){
+					status="1";
+					window.localStorage.setItem("access", status);
+					$.mobile.changePage('login1.html',{changeHash:false});
+				});
+				
+				$("#mpin_submit").click(function(){
+					fun_mpin();
+				});
+				
+			});
+			
+			// script for login page using M-Pin
+			$(document).on('pageshow','#id_pinlog',function(){
+				
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        /* alert('You pressed enter!mpinlog'); */
+				        fun_mpinlog();
+				    }
+				});
+				
+				$("#login_pin").click(function(){
+					fun_mpinlog();
+			 	});
+				
+			});
+			
+			// script for login page using Username
+			$(document).on('pageshow','#id_userlog',function(){
+				
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				       /*  alert('You pressed enter!userlog'); */
+				        fun_userlog();
+				    }
+				});
+				
+				$("#login_user").click(function(){
+					fun_userlog();
+			 	});
+				
+			});
+    				
+    			
+			//Trend page functionality on Home   
+			 $(document).on('pageshow','#page_trend',function(){
+				$("#trend_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				
+				});
+				$("#today_trend").click(function(){
+					alert("today_trend");
+					$.mobile.changePage("today.html", {changeHash : true}); 
+				
+				});
+				$("#seven_trend").click(function(){
+					alert("seven_trend");
+					$.mobile.changePage("last_seven.html", {changeHash : true});  
+				
+				});
+				$("#month_trend").click(function(){
+					alert("month_trend");
+					$.mobile.changePage("last_month.html", {changeHash : true}); 
+				
+				});
+    		});
+			 
+			//Current page Trends
+			$(document).on('pageshow','#today',function(){
+				$("#canvas").hide();
+				var Meter_Id = window.localStorage.getItem("meter_id");    
+				/* var Meter_Id = "a00058";  */ 
+				navigator.notification.alert('Current Day trend of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+				tab_id=0;
+				var data={Meter_Id: Meter_Id,tabId:tab_id};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"raj_trend.php",
+  	        		  success: function(response){
+  	        			if(response){
+  	        				currAdd(response);
+  	        			}else{
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+				
+				//Add dynamically list of current Trend
+		  		function currAdd(data){
+					for(var i=0;i<1;i++){
+  	        			ae_main=data.anil[0];
+  	        			ae_dg=data.anil[1];
+  	        			amount=data.anil[2];
+  	        			dt=data.anil[3];
+						$('#list_today').append(
+							'<li style="background-color: transparent;width:100%;padding-left:2%;padding-right:2%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 20%; height: 100%; color:white;text-align: center; ">'+ae_main+'</label><label class="ui-block-b" style="width: 20%; height: 100%; color:white;text-align: center;">'+ae_dg+'</label><label class="ui-block-c" style="width: 25%; height: 100%; color:white;text-align: center;">'+amount+'</label><label class="ui-block-d" style="width: 35%; height: 100%; color:white;text-align: center;">'+dt+'</label></div></li>');
+					} 
+					$("#canvas").show();
+					var barChartData = {
+							labels : [dt],
+							datasets : [
+								{
+									fillColor : "rgba(220,220,220,0.5)",
+									strokeColor : "rgba(220,220,220,0.8)",
+									highlightFill: "rgba(220,220,220,0.75)",
+									highlightStroke: "rgba(220,220,220,1)",
+									data : [ae_main]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [amount]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [ae_dg]
+								}
+							]
+						} 
+					var ctx = document.getElementById("canvas").getContext("2d");
+					window.myBar = new Chart(ctx).Bar(barChartData, {
+						responsive : true
+					}); 
+			 	}
+				
+				$("#today_back").click(function(){
+					$.mobile.changePage("trend.html", {changeHash : true});
+				});
+			});
+			
+			// Last 7 day trend
+			$(document).on('pageshow','#last_seven',function(){
+				$("#canvas").hide();
+				var Meter_Id = window.localStorage.getItem("meter_id");   
+				/*  var Meter_Id = "a00058"; */  
+				navigator.notification.alert('Last 7 Days trend of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+				tab_id=1;
+				var data={Meter_Id: Meter_Id,tabId:tab_id};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"raj_trend.php",
+  	        		  success: function(response){
+  	        			if(response){
+  	        				sevenAdd(response);
+  	        			}else{
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+				
+				//Add dynamically list of Last seven Transaction
+		  		function sevenAdd(data){
+		  			$('#list_seven').children().removeClass('ui-body-c');
+					arr1 = data.anil[0];
+					arr2 = data.anil[1];
+					arr3 = data.anil[2];
+					arr4 = data.anil[3];
+					for(var i=0; i<arr1.length; i++){
+					$('#list_seven').append(
+						'<li style="background-color: transparent;width:100%;padding-left:2%;padding-right:2%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 20%; height: 100%; color:white;text-align: center;">'+arr1[i]+'</label><label class="ui-block-b" style="width: 20%; height: 100%; color:white;text-align: center;">'+arr2[i]+'</label><label class="ui-block-c" style="width: 25%; height: 100%; color:white;text-align: center;">'+arr3[i]+'</label><label class="ui-block-d" style="width: 35%; height: 100%; color:white;text-align: center;">'+arr4[i]+'</label></div></li>');
+					} 
+					$("#canvas").show();
+					var barChartData = {
+							labels : [arr4[0],arr4[1],arr4[2],arr4[3],arr4[4],arr4[5],arr4[6]],
+							datasets : [
+								{
+									fillColor : "rgba(220,220,220,0.5)",
+									strokeColor : "rgba(220,220,220,0.8)",
+									highlightFill: "rgba(220,220,220,0.75)",
+									highlightStroke: "rgba(220,220,220,1)",
+									data : [arr1[0],arr1[1],arr1[2],arr1[3],arr1[4],arr1[5],arr1[6]]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [arr2[0],arr2[1],arr2[2],arr2[3],arr2[4],arr2[5],arr2[6]]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [arr3[0],arr3[1],arr3[2],arr3[3],arr3[4],arr3[5],arr3[6]]
+								}
+							]
+						} 
+					var ctx = document.getElementById("canvas").getContext("2d");
+					window.myBar = new Chart(ctx).Bar(barChartData, {
+						responsive : true
+					});
+			 	}
+				
+				$("#seven_back").click(function(){
+					$.mobile.changePage("trend.html", {changeHash : true});
+				});
+			}); 
+			
+			// Last 6 month trend
+			$(document).on('pageshow','#last_month',function(){
+				$("#canvas").hide();
+				var Meter_Id = window.localStorage.getItem("meter_id");
+				/* var Meter_Id = "a00058";  */ 
+				navigator.notification.alert('Last 6 Months trend of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+				tab_id=2;
+				var data={Meter_Id: Meter_Id,tabId:tab_id};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"raj_trend.php",
+  	        		  success: function(response){
+  	        			if(response){
+  	        				monthAdd(response);
+  	        			}else{
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+				
+				//Add dynamically list of Last 6 months Transaction
+		  		function monthAdd(data){
+		  			arr1 = data.anil[0];
+					arr2 = data.anil[1];
+					arr3 = data.anil[2];
+					arr4 = data.anil[3];
+					/* alert(arr1.length); */
+					for(var i=0; i<arr1.length; i++){
+					$('#list_month').append(
+						'<li style="background-color: transparent;width:100%;padding-left:2%;padding-right:2%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 20%; height: 100%; color:white;text-align: center; ">'+arr1[i]+'</label><label class="ui-block-b" style="width: 20%; height: 100%; color:white;text-align: center;">'+arr2[i]+'</label><label class="ui-block-c" style="width: 25%; height: 100%; color:white;text-align: center;">'+arr3[i]+'</label><label class="ui-block-d" style="width: 35%; height: 100%; color:white;text-align: center;">'+arr4[i]+'</label></div></li>');
+					} 
+					$("#canvas").show();
+					var barChartData = {
+							labels : [arr4[0],arr4[1],arr4[2],arr4[3],arr4[4],arr4[5]],
+							datasets : [
+								{
+									fillColor : "rgba(220,220,220,0.5)",
+									strokeColor : "rgba(220,220,220,0.8)",
+									highlightFill: "rgba(220,220,220,0.75)",
+									highlightStroke: "rgba(220,220,220,1)",
+									data : [arr1[0],arr1[1],arr1[2],arr1[3],arr1[4],arr1[5]]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [arr2[0],arr2[1],arr2[2],arr2[3],arr2[4],arr2[5]]
+								},
+								{
+									fillColor : "rgba(151,187,205,0.5)",
+									strokeColor : "rgba(151,187,205,0.8)",
+									highlightFill : "rgba(151,187,205,0.75)",
+									highlightStroke : "rgba(151,187,205,1)",
+									data : [arr3[0],arr3[1],arr3[2],arr3[3],arr3[4],arr3[5]]
+								}
+							]
+						} 
+					var ctx = document.getElementById("canvas").getContext("2d");
+					window.myBar = new Chart(ctx).Bar(barChartData, {
+						responsive : true
+					});
+			 	} 
+				
+				$("#month_back").click(function(){
+					$.mobile.changePage("trend.html", {changeHash : true});
+				});
+			});	 
+			
+			//Present Status page functionality on Home   
+			$(document).on('pageshow','#pres_status',function(){
+				$("#status_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				
+				});
+			}); 
+    				
+			//Chart page functionality on Home
+			$(document).on('pageshow','#chart_page',function(){
+				var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+				var barChartData = {
+						labels : ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"],
+						datasets : [
+							{
+								fillColor : "rgba(220,220,220,0.5)",
+								strokeColor : "rgba(220,220,220,0.8)",
+								highlightFill: "rgba(220,220,220,0.75)",
+								highlightStroke: "rgba(220,220,220,1)",
+								data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+							},
+							{
+								fillColor : "rgba(151,187,205,0.5)",
+								strokeColor : "rgba(151,187,205,0.8)",
+								highlightFill : "rgba(151,187,205,0.75)",
+								highlightStroke : "rgba(151,187,205,1)",
+								data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+							},
+							{
+								fillColor : "rgba(151,187,205,0.5)",
+								strokeColor : "rgba(151,187,205,0.8)",
+								highlightFill : "rgba(151,187,205,0.75)",
+								highlightStroke : "rgba(151,187,205,1)",
+								data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+							}
+						]
+					} 
+				
+					var ctx = document.getElementById("canvas").getContext("2d");
+					window.myBar = new Chart(ctx).Bar(barChartData, {
+						responsive : true
+					});
+					//Return to home.html
+					$("#chart_back").click(function(){
+						$.mobile.changePage("home.html", {changeHash : true});
+					
+					});
+				}); 
+			
+			//Recharge page functionality on Home
+			$(document).on('pageshow','#recharge_menu',function(){
+				/* alert("welcome"); */
+				$("#recharge_back").click(function(){
+					/* alert("hello"); */
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+				
+				$("#btn_coupon").click(function(){
+					$.mobile.changePage("coupon.html", {changeHash : true});
+				});
+				
+				$("#btn_last_recha").click(function(){
+					$.mobile.changePage("last_recharge.html", {changeHash : true});
+				});
+				
+				//Return to home.html
+				$("#buyNowBtn").click(function(){
+					PayPalMobile.renderSinglePaymentUI(app.createPayment(), app.onSuccesfulPayment,
+					        app.onUserCanceled);
+					/* $.mobile.changePage("home.html", {changeHash : true}); */
+				});
+    		}); 
+			
+			//Coupon_Page functionality
+			$(document).on('pageshow','#coupon_page',function(){
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				       /*  alert('You pressed enter! coupon'); */
+				        fun_coupon();
+				    }
+				});
+				
+				$("#coupon_back").click(function(){
+					$.mobile.changePage("recharge_page.html", {changeHash : true});
+				});
+				
+				$("#coupon_sender").click(function(){
+					fun_coupon();
+				});
+    		}); 
+			
+			//Last_recharge functionality
+			$(document).on('pageshow','#last_recharge',function(){
+			 	var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* var Meter_Id = "a00058"; */ 
+				navigator.notification.alert('Last Recharge detail of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+				
+				var data={Meter_Id: Meter_Id};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		  url: address+"LastRechargeStatus.php",
+  	        		  success: function(response){
+  	        			if(response){
+  	        				/* var length=response.anil.length; */
+  	        				rechargeAdd(response);
+  	        			}else{
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+				
+				//Add dynamically list of Last Recharge
+		  		function rechargeAdd(data){
+					for(var i=0;i<1;i++){
+						var dtm=data.anil.Current_Date_Time;
+  	        			var trns=data.anil.tranid;
+  	        			var mode=data.anil.Payment_Mode;
+  	        			var amount=data.anil.Amount;
+  	        				
+  	        			$('#list_recharge').append(
+  								'<li style="background-color: transparent;width:100%;padding-left:2%;padding-right:2%;"><div class="ui-grid-c" "><label class="ui-block-a" style="width: 40%; height: 100%; color:white;text-align: center; ">'+dtm+'</label><label class="ui-block-b" style="width: 30%; height: 100%; color:white;text-align: center;">'+trns+'</label><label class="ui-block-c" style="width: 15%; height: 100%; color:white;text-align: center;">'+mode+'</label><label class="ui-block-d" style="width: 15%; height: 100%; color:white;text-align: center;">'+amount+'</label></div></li>');
+  						} 
+			 	} 
+				
+		  		$("#last_rech_back").click(function(){
+					$.mobile.changePage("recharge_page.html", {changeHash : true});
+				});
+				
+    		});
+			
+			function showAlert( )
+			{
+				var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* var Meter_Id = "a00058"; */
+				/* navigator.notification.alert('Servent_On of meter_id: '+Meter_Id,function(){ },'Successful','Continue'); */
+				var data={Meter_Id: Meter_Id,dateTime:timeDate};
+				console.log(timeDate);
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		 url: address+"ServentModeOn.php",
+  	        		 success: function(response){
+  	        		 	if(response>1){
+  	        		 		servent_mode=1;
+							window.localStorage.setItem("serve", servent_mode);
+							var str1 = './img/serv.png';
+        		 		    $('#ss').attr('src',str1);
+  	        		 		navigator.notification.alert('On Servant On Command:- Demand For Servant Mode On Executed Successfully.',function(){ },'Successful','Continue');
+  	        				
+  	        			}else{
+  	        				clearTimeout ( alertTimerId );
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+			}
+			
+			function offAlert( )
+			{
+				var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* var Meter_Id = "a00058"; */
+				/* navigator.notification.alert('Servent_On of meter_id: '+Meter_Id,function(){ },'Successful','Continue'); */
+				var data={Meter_Id: Meter_Id,dateTime:timeDate};
+				console.log(timeDate);
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		 url: address+"ServentModeOff.php",
+  	        		 success: function(response){
+  	        		 	if(response>1){
+  	        		 		servent_mode=0;
+  	        		 		console.log("off succe log");
+							window.localStorage.setItem("serve", servent_mode);
+							var str1 = './img/dashboard_icon5.png';
+  	        		 		$('#ss').attr('src',str1);
+  	        		 		navigator.notification.alert('On Servant Off Command:  Demand For Servant Mode Off Executed Successfully.',function(){ },'Successful','Continue');
+  	        				
+  	        			}else{
+  	        				clearTimeout ( alertTimerId );
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+			}
+
+			function showload( )
+			{
+				/* var Meter_Id = "a00058"; */
+				var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* navigator.notification.alert('Load_On of meter_id: '+Meter_Id,function(){ },'Successful','Continue'); */
+				var data={Meter_Id: Meter_Id,dateTime:timeDate};
+				$.ajax({
+  	        		 type: "POST",
+  	        		 data:data,
+  	        		 dataType: "json",
+  	        		 url: address+"MeterOn.php",
+  	        		 success: function(response){
+  	        		 	if(response>0){
+  	        		 		load_mode=1;
+							window.localStorage.setItem("load", load_mode);
+							var str1 = './img/load.png';
+  	        		 		$('#mm').attr('src',str1);
+  	        		 		navigator.notification.alert('On Meter On Command:- Demand For Load On Executed Successfully.',function(){ },'Successful','Continue');
+  	        		 		
+  	        			}else{
+  	        				clearTimeout ( alertTimerId );
+  	        				navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+			}
+			
+			function offload( )
+			{
+				/* var Meter_Id = "a00058"; */
+				var Meter_Id = window.localStorage.getItem("meter_id");
+				/* navigator.notification.alert('Load_Off of meter_id: '+Meter_Id,function(){ },'Successful','Continue'); */
+				var data={Meter_Id: Meter_Id,dateTime:timeDate};
+				$.ajax({
+					 type: "POST",
+					 data:data,
+					 dataType: "json",
+					 url: address+"MeterOff.php",
+					 success: function(response){
+						if(response>0){
+							load_mode=0;
+							window.localStorage.setItem("load", load_mode);
+							var str1 = './img/dashboard_icon6.png';
+  	        		 		$('#mm').attr('src',str1);
+							navigator.notification.alert('On Meter Off Command:  Demand For Load Off Executed Successfully.',function(){ },'Successful','Continue');
+						}else{
+							clearTimeout ( alertTimerId );
+							navigator.notification.alert('Something goes wrong',function(){ },'Unsuccessful','Continue');
+  	        			}
+  	        		  },
+  	        	});  
+			}
+			
+			$(document).on('pageshow','#page_home',function(){ 
+				var Meter_Id = window.localStorage.getItem("meter_id");
+				/* window.localStorage.setItem("session","loggedout"); */
+				$("#logout").click(function(){
+					window.localStorage.setItem("session","loggedout");
+					alert("logout");
+					$.mobile.changePage("login.html", {changeHash : true});
+				});
+				
+				$("#servent").click(function(){
+					navigator.notification.confirm("Do you want to Servant On/Off?", function(result){
+				        if(result == 2){
+				        	var s_mode = window.localStorage.getItem("serve",0);
+							if(s_mode==0){
+								timeDate="";
+								navigator.notification.alert('Servant_On of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+								var data={Meter_Id: Meter_Id,dateTime:timeDate};
+								$.ajax({
+				  	        		 type: "POST",
+				  	        		 data:data,
+				  	        		 dataType: "json",
+				  	        		 url: address+"ServentModeOn.php",
+				  	        		 success: function(response){
+				  	        			json_res=response.anil.status_m;
+				  	        			alert(response.anil.status_m);
+				  	        		 	if(json_res==0){
+				  	        		 		servent_mode=1;
+				  	        		 		console.log(servent_mode);
+				  	        		 		window.localStorage.setItem("serve", servent_mode);
+			  	        		 		    var str1 = './img/serv.png';
+			  	        		 		    $('#ss').attr('src',str1);
+											navigator.notification.alert('On Servant On Command:- Demand For Servant Mode On Executed Successfully.',function(){ },'Successful','Continue');
+				  	        		 		
+				  	        			}else{
+				  	        				timeDate=response.anil.date;
+				  	        				alertTimerId = setTimeout( "showAlert()", 30000 );
+				  	        			}
+				  	        		  },
+				  	        	});  
+								
+							}else{
+								navigator.notification.alert('Servant_Off of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+								timeDate="";
+								var data={Meter_Id: Meter_Id,dateTime:timeDate};
+								$.ajax({
+				  	        		 type: "POST",
+				  	        		 data:data,
+				  	        		 dataType: "json",
+				  	        		 url: address+"ServentModeOff.php",
+				  	        		 success: function(response){
+				  	        			json_res=response.anil.status_m;
+				  	        			alert("off"+json_res);
+				  	        		 	if(json_res==0){
+				  	        		 		servent_mode=0;
+				  	        		 		console.log(servent_mode);
+											window.localStorage.setItem("serve", servent_mode);
+											var str1 = './img/dashboard_icon5.png';
+				  	        		 		$('#ss').attr('src',str1);
+				  	        		 		navigator.notification.alert('On Servant Off Command:  Demand For Servant Mode Off Executed Successfully.',function(){ },'Successful','Continue');
+				  	        			}else{
+				  	        				timeDate=response.anil.date;
+				  	        				console.log(timeDate);
+				  	        				alertTimerId = setTimeout( "offAlert()", 30000 );
+				  	        			}
+				  	        		  },
+				  	        	});  
+							}
+				        }
+				    }, 'Servant On/Off', 'Cancel,Ok');
+				});
+				
+				$("#load_meter").click(function(){
+					navigator.notification.confirm("Do you want to Meter Load On/Off?", function(result){
+				        if(result == 2){
+				        	var load_mode = window.localStorage.getItem("load",0);
+							if(load_mode==0){
+								navigator.notification.alert('Load_On of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+								timeDate="";
+								var data={Meter_Id: Meter_Id,dateTime:timeDate};
+								$.ajax({
+				  	        		 type: "POST",
+				  	        		 data:data,
+				  	        		 dataType: "json",
+				  	        		 url: address+"MeterOn.php",
+				  	        		 success: function(response){
+				  	        			json_res=response.anil.status_m;
+				  	        		 	if(json_res==0){
+				  	        		 		load_mode=1;
+											window.localStorage.setItem("load", load_mode);
+											var str1 = './img/load.png';
+				  	        		 		$('#mm').attr('src',str1);
+				  	        		 		navigator.notification.alert('On Meter On Command:- Demand For Load On Executed Successfully.',function(){ },'Successful','Continue');
+				  	        		 		
+				  	        			}else{
+				  	        				timeDate=response.anil.date;
+				  	        				alertloadId = setTimeout( "showload()", 30000 );
+				  	        			}
+				  	        		  },
+				  	        	});  
+							}else{
+								navigator.notification.alert('Load_Off of meter_id: '+Meter_Id,function(){ },'Successful','Continue');
+								timeDate="";
+								var data={Meter_Id: Meter_Id,dateTime:timeDate};
+								$.ajax({
+				  	        		 type: "POST",
+				  	        		 data:data,
+				  	        		 dataType: "json",
+				  	        		 url: address+"MeterOff.php",
+				  	        		 success: function(response){
+				  	        			json_res=response.anil.status_m;
+				  	        		 	if(json_res==0){
+				  	        		 		load_mode=0;
+											window.localStorage.setItem("load", load_mode);
+											var str1 = './img/dashboard_icon6.png';
+				  	        		 		$('#mm').attr('src',str1);
+				  	        		 		navigator.notification.alert('On Meter Off Command:  Demand For Load Off Executed Successfully.',function(){ },'Successful','Continue');
+				  	        			}else{
+				  	        				timeDate=response.anil.date;
+				  	        				alertloadId = setTimeout( "offload()", 10000 );
+				  	        			}
+				  	        		},
+				  	        	});  
+							}
+				        }
+				    }, 'Meter On/Off', 'Cancel,Ok');
+				});
+    		}); 
+			
+			//Last Transaction page functionality on Home
+			$(document).on('pageshow','#last_trans',function(){ 
+				$('#btn_tentrans').css({
+                    'background-color' : '#00BEE9',
+                    'color' : '#FFFFFF'
+                });
+				
+                $('#btn_detailtrans').css({
+                    'background-color' : '#F2F2F2',
+                    'color' : '#434343'
+                });
+                
+                $('#ten_trans').css({
+                    'display' : ''
+                });
+                $('#detail_trans').css({
+                	'display' : 'none'
+                });
+                
+                $('#detail_fill').css({
+                	'display' : 'none'
+                });
+                /* trans_tab=0; */
+                /* alert("hello"); */
+               fun_tentrans();
+				
+				$('#btn_tentrans').click(function() {
+					$('#btn_tentrans').css({
+                        'background-color' : '#00BEE9',
+                        'color' : '#FFFFFF'
+                    });
+					
+                    $('#btn_detailtrans').css({
+                        'background-color' : '#F2F2F2',
+                        'color' : '#434343'
+                    });
+                    
+                    $('#ten_trans').css({
+                        'display' : ''
+                    });
+                    $('#detail_trans').css({
+                    	'display' : 'none'
+                    });
+                    $('#detail_fill').css({
+                    	'display' : 'none'
+                    });
+                    /* trans_tab=0; */
+                  /*   alert("hello"); */
+                   fun_tentrans();
+                    
+                });
+				
+				$('#btn_detailtrans').click(function() {
+					
+					
+					 $('#btn_detailtrans').css({
+                        'background-color' : '#00BEE9',
+                        'color' : '#FFFFFF'
+                    });
+					
+                    $('#btn_tentrans').css({
+                        'background-color' : '#F2F2F2',
+                        'color' : '#434343'
+                    });
+                    
+                    $('#detail_trans').css({
+                        'display' : 'none'
+                    });
+                    $('#ten_trans').css({
+                    	'display' : 'none'
+                    });
+                    $('#detail_fill').css({
+                    	'display' : ''
+                    });
+                  /*   fun_detailtrans();  */
+                    
+                });
+				$('#show_trans').click(function() {
+					start_dt=$("#st_dt").val();
+					end_dt=$("#en_dt").val();
+					
+					$('#btn_detailtrans').css({
+		                'background-color' : '#00BEE9',
+		                'color' : '#FFFFFF'
+		            });
+		
+		            $('#btn_tentrans').css({
+		                'background-color' : '#F2F2F2',
+		                'color' : '#434343'
+		            });
+		            
+		            $('#detail_trans').css({
+		                'display' : ''
+		            });
+		            
+		            $('#ten_trans').css({
+		            	'display' : 'none'
+		            });
+		            
+		            $('#detail_fill').css({
+		               	'display' : 'none'
+		            });
+		          
+		            fun_detailtrans(); 
+		            
+               });
+				
+				$("#trans_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+    		}); 
+			
+			$(document).on('pageshow','#profile_page',function(){ 
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        alert('You pressed enter profile!');
+				        fun_profile();
+				    }
+				});
+				
+				$("#update_pro").click(function(){
+					fun_profile();
+				});
+				
+				$("#cancel_pro").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+				
+				$("#profile_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+    		}); 
+			
+			$(document).on('pageshow','#apn_forget',function(){ 
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        /* alert('You pressed enter profile!'); */
+				    	fun_forgetPin();
+				    }
+				});
+				
+				$("#for_cancel").click(function(){
+					$.mobile.changePage("login.html", {changeHash : true});
+				});
+				
+				$("#mo_submit").click(function(){
+					fun_forgetPin();
+				});
+    		}); 
+			
+			$(document).on('pageshow','#pass_forget',function(){ 
+				$(this).keypress(function(e) {
+				    if(e.which == 13) {
+				        /* alert('You pressed enter profile!'); */
+				    	fun_forgetPass();
+				    }
+				});
+				
+				$("#forg_cancel").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+				
+				$("#mob_submit").click(function(){
+					fun_forgetPass();
+				});
+    		}); 
+			
+			$(document).on('pageshow','#notifi',function(){ 
+				var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* var Meter_Id = "a00058"; */  
+				var data={Meter_Id: Meter_Id};
+				$.post(address+'NotificationForConsumer.php ', data, function(response) {
+					$.each( response, function( key, val ) {
+  	        			var noti_name=val.notification_Name;
+  	        			var not_date=val.creation_Datetime;
+  	        			var noti_auth=val.authirity_Name; 
+  	        			/* alert(val.notification_Name); */
+  	        			$('#testmsg').append(
+  	        					'<li class="ui-grid-b" style="background-color:white; min-height:90px; margin-top: 5px;width:100%;border:0px;margin-left:15%;"><label class="ui-block-a" style="width: 100%; height: 85%;float: left;padding-left:1%;">'+noti_name+'</label><label class="ui-block-b" style="width: 100%; height: 10%; font-size:7px; float: left;padding-left:1%;">'+noti_auth+'</label><label class="ui-block-c" style="width: 100%; height: 5%; font-size:5px; float: left;padding-left:1%;">'+not_date+'</label></div></li>');
+					  });
+				}, 'json');
+				
+				
+				$("#notifi_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+				
+			
+    		}); 
+			
+			
+			
+			$(document).on('pageshow','#pres_status',function(){ 
+				var Meter_Id = window.localStorage.getItem("meter_id"); 
+				/* var Meter_Id = "a00058"; */
+				var data={Meter_Id: Meter_Id};
+				$.post(address+'PresentMeterStatus.php ', data, function(response) {
+					$.each( response, function( key, val ) {
+  	        			var vr=val.Voltage_R;
+  	        			var vy=val.Voltage_Y;
+  	        			var vb=val.Voltage_B;
+  	        			var cr=val.Current_R;
+  	        			var cy=val.Current_Y;
+  	        			var cb=val.Current_B;
+  	        			var power=val.ActivePower;
+  	        			var eb=val.EB;
+  	        			var dg=val.DG;
+  	        			var sm=val.SM;
+  	        			var ol=val.OL;
+  	        			var lb=val.LB;
+  	        			var eb_active=val.ActiveEnergy_Main;
+  	        			var dg_active=val.ActiveEnergy_DG;
+  	        			var open=val.Opening_Balance;
+  	        			var upload=val.Uploaded_Balance;
+  	        			var bill=val.Bill_Amount;
+  	        			var c_bal=val.Current_Balance;
+  	        			
+  	        			alert("hello");
+  	        			$('#voltage').append('<table id="myTable" style="text-align: center;text-shadow: none;margin-left: 10%;color:white;"><tr><th> </th><th>R</th><th>Y</th><th>B</th></tr><tr><td>Voltage</td><td>'+vr+'</td><td>'+vy+'</td><td>'+vb+'</td></tr><tr><td>Current</td><td>'+cr+'</td><td>'+cy+'</td><td>'+cb+'</td></tr><tr><td>Active Power</td><td colspan="3">'+power+'</td></tr></table>');
+  	        			$('#mt_tab').append('<table id="light" style="text-align: center;text-shadow: none;margin-left: 10%;text-align: center;color:white;" align="center"><tr><th>EB</th><th>DG</th><th>SM</th><th>OL</th><th>LB</th></tr><tr><td>'+eb+'</td><td>'+dg+'</td><td>'+sm+'</td><td>'+ol+'</td><td>'+lb+'</td></tr></table>');
+  	        			$('#read_tbl').append('<table id="read_table" style="text-align: center;text-shadow: none;margin-left: 10%;text-align: center;color:white;"><tr><th>EB</th><th>DG</th></tr><tr><td>'+eb_active+'</td><td>'+dg_active+'</td></tr></table>');
+  	        			$('#bill_data').append('<label style="text-transform: none;float:left; color: white;text-shadow: none;">Opening Balance:'+open+'</label><label style="text-transform: none;float:left;color: white;text-shadow: none;">Uploaded Balance:'+upload+'</label><label style="text-transform: none;float:left;color: white;text-shadow: none;">Bill Amount:'+bill+'</label><label style="text-transform: none;float:left;color: white;text-shadow: none;">Current Balance:'+c_bal+'</label>');					
+					});
+				}, 'json');
+				
+				$("#pre_back").click(function(){
+					$.mobile.changePage("home.html", {changeHash : true});
+				});
+				
+    		}); 
+			
+			
+		 } 
+    </script> 
+		
+		
+        <style type="text/css">
+        	/* body {
+				background: url("img/background.png");
+				background-size:100% 100%;
+				background-position:center center;
+				background-attachment:fixed;  
+				} */
+				body{
+				background: -webkit-linear-gradient(#cf380f,#ee5922,#d84822)!important;
+  				background: -moz-linear-gradient(#cf380f,#ee5922,#d84822)!important;
+  				background: linear-gradient(#cf380f,#ee5922,#d84822)!important;
+  				width: 100%;
+  				height: 100%;
+				
+				}
+				html, body {
+				    max-width: 100%;
+				    overflow-x: hidden;
+				}
+				table, td {
+				    border: 1px solid black;
+				}
+			
+			.ui-page {
+			    background: transparent;
+			}
+				.ui-content{
+				    background: transparent;
+				    -webkit-overflow-scrolling: touch;   
+					 overflow:auto;
+			 		overflow-y:scroll;
+				}
+			/* .tbox
+				{
+					outline:0;
+					margin-top:10px;
+					text-shadow:none;
+					background-color: transparent;
+					border-radius:5px; 
+					color:#FFFFFF;
+					width: 80%; 
+					height: 5%; 
+					border-color: #FFFFFF; 
+					hover:#0a6603;
+					border:1px solid;
+					
+				} */
+				/* .inputbox
+				{
+					outline:0;
+					text-shadow:none;
+					background-color: transparent;
+					color:#FFFFFF;
+					width: 90%; 
+					margin:1%;
+					border-color: transparent; 
+					hover:#0a6603;
+					padding: 1%;
+				} */
+			input:-moz-placeholder, input::-webkit-input-placeholder {  
+				      color: #FFFFFF;  
+			    } 
+			
+			.ui-panel.ui-panel-open {
+			    position:fixed;
+			    data-position:fixed;
+			}
+			.ui-panel-inner {
+			    position: absolute;
+			    top: 1px;
+			    left: 0;
+			    right: 0;
+			    bottom: 0px;
+			    overflow: scroll;
+			    -webkit-overflow-scrolling: touch;
+			}​ 
+			
+			.ui-panel-dismiss {
+				left: 200px !important;
+			}
+			.ui-page-active {
+				height: 70% !important;
+			}
+			
+			.selectorbox{
+			outline:0;
+			margin-top:10px;
+			text-shadow: none;
+			background-color: transparent;
+			border-radius: 5px;
+			color: #FFFFFF;
+			width: 83%;
+			height: 38px;
+			border-color: #A9A9A9;
+			border: 1px solid;
+			/*padding: 2%;*/
+			
+			}
+			ul li.ui-li-divider{
+			width:100%;
+    			border-top:1px solid #ccc !important;
+			}
+				ul li {
+				width:100%;
+    			border-top:1px solid #ccc !important;
+			}
+			@viewport {
+			    width: auto;
+			    height: auto;
+			    background-size: cover;
+			}
+			.main{
+				clear: both;
+				overflow-y: scroll;
+				margin-top:2%; 
+				overflow-x: hidden;
+			}
+			
+        </style>
+    </head>
+    <body >
+    
+    	
+    </body>
+</html>
